@@ -40,31 +40,50 @@ public class GamePanel extends JPanel implements Runnable{
 		gameThread.start();
 	}
 	
-	@Override
-	public void run() {
-		
-		while(gameThread != null) {
-			
-			update();
-			
-			repaint();
-		}
-	}
-	public void update() {
-		
-		if(keyH.upPressed == true) {
-			playerY -= playerSpeed;
-		}
-		else if(keyH.downPressed == true) {
-			playerY += playerSpeed;
-		}
-		else if(keyH.leftPressed == true) {
-			playerX -= playerSpeed;
-		}
-		else if(keyH.rightPressed == true) {
-			playerX += playerSpeed;
-		}
-	}
+	// Game loop to continuously update and repaint
+    @Override
+    public void run() {
+        long lastTime = System.nanoTime();
+        final double nsPerTick = 1000000000.0 / 60.0; // 60 FPS target
+        double delta = 0;
+
+        while (gameThread != null) {
+            long now = System.nanoTime();
+            delta += (now - lastTime) / nsPerTick;
+            lastTime = now;
+
+            // If it's time for the next tick, update and repaint the screen
+            if (delta >= 1) {
+                update();
+                repaint();
+                delta--;
+            }
+        }
+    }
+
+    // Updates the player's position based on key inputs
+    public void update() {
+        // Handle player movement
+        if (keyH.upPressed) {
+            playerY -= playerSpeed;
+        }
+        if (keyH.downPressed) {
+            playerY += playerSpeed;
+        }
+        if (keyH.leftPressed) {
+            playerX -= playerSpeed;
+        }
+        if (keyH.rightPressed) {
+            playerX += playerSpeed;
+        }
+
+        // Prevent player from going off-screen
+        if (playerX < 0) playerX = 0;
+        if (playerY < 0) playerY = 0;
+        if (playerX > screenWidth - tileSize) playerX = screenWidth - tileSize;
+        if (playerY > screenHeight - tileSize) playerY = screenHeight - tileSize;
+    }
+        @Override
 	public void paintComponent(Graphics g) {
 		
 		super.paintComponent(g);
